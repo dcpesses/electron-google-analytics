@@ -19,19 +19,53 @@ class Analytics {
     this.globalTrackingID = trackingID;
     // Google API version
     this.globalVersion = version;
-    this.customDimensions = {};
-    this.customMetrics = {};
+    this.customParams = {};
+  }
+
+
+  /**
+   * Adds custom parameters to all subsequent requests
+   * NOTE: Params must adhere to the naming convention
+   * used by the Measurement Protocol
+   *
+   * @param  {Object} params   Parameters object
+   */
+  set(params) {
+    this.customParams = Object.assign(this.customParams, params);
+    return this.customParams;
   }
 
   /**
-   * Set a custom dimension to be used in all subsequent requests
+   * Returns the value of a previously set custom parameter
+   *
+   * @param  {string} param    Parameter id
+   *
+   * @return {string}
+   */
+  get(param) {
+    return (!this.customParams[param]) ? null : this.customParams[param];
+  }
+
+  /**
+   * Removes a previously set custom parameter, returns success
+   *
+   * @param  {string} param    Parameter id
+   *
+   * @return {boolean}
+   */
+  delete(param) {
+    return this.customParams[param] = null;
+  }
+
+  /**
+   * Sets a custom dimension to be used in all subsequent requests
    *
    * @param  {Number} dimension  Dimension Id
    * @param  {string} value      Dimension value
    */
   setcustomdimension(dimension, value) {
-    this.customDimensions = Object.assign(this.customDimensions, {['cd'+dimension]: value});
-    return this.customDimensions;
+    this.customParams = Object.assign(this.customParams, {['cd'+dimension]: value});
+    return this.customParams;
   }
 
   /**
@@ -41,8 +75,8 @@ class Analytics {
    * @param  {string} value   Metric value
    */
   setcustommetric(metric, value) {
-    this.customMetrics = Object.assign(this.customDimensions, {['cd'+metric]: value});
-    return this.customMetrics;
+    this.customParams = Object.assign(this.customParams, {['cd'+metric]: value});
+    return this.customParams;
   }
 
   /**
@@ -374,9 +408,8 @@ class Analytics {
         t: hitType
       };
       if (params) Object.assign(formObj, params);
-      
-      if (Object.keys(this.customDimensions).length > 0) Object.assign(formObj, this.customDimensions);
-      if (Object.keys(this.customMetrics).length > 0) Object.assign(formObj, this.customMetrics);
+
+      if (Object.keys(this.customParams).length > 0) Object.assign(formObj, this.customParams);
 
       let url = `${this.globalBaseURL}${this.globalCollectURL}`;
       if (this.globalDebug) {
