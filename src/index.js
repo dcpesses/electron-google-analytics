@@ -19,6 +19,30 @@ class Analytics {
     this.globalTrackingID = trackingID;
     // Google API version
     this.globalVersion = version;
+    this.customDimensions = {};
+    this.customMetrics = {};
+  }
+
+  /**
+   * Set a custom dimension to be used in all subsequent requests
+   *
+   * @param  {Number} dimension  Dimension Id
+   * @param  {string} value      Dimension value
+   */
+  setcustomdimension(dimension, value) {
+    this.customDimensions = Object.assign(this.customDimensions, {['cd'+dimension]: value});
+    return this.customDimensions;
+  }
+
+  /**
+   * Set a custom metric to be used in all subsequent requests
+   *
+   * @param  {Number} metric  Metric Id
+   * @param  {string} value   Metric value
+   */
+  setcustommetric(metric, value) {
+    this.customMetrics = Object.assign(this.customDimensions, {['cd'+metric]: value});
+    return this.customMetrics;
   }
 
   /**
@@ -350,6 +374,9 @@ class Analytics {
         t: hitType
       };
       if (params) Object.assign(formObj, params);
+      
+      if (Object.keys(this.customDimensions).length > 0) Object.assign(formObj, this.customDimensions);
+      if (Object.keys(this.customMetrics).length > 0) Object.assign(formObj, this.customMetrics);
 
       let url = `${this.globalBaseURL}${this.globalCollectURL}`;
       if (this.globalDebug) {
